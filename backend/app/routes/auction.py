@@ -102,7 +102,10 @@ async def place_bid(auction_id: str, bid_data: BidCreate, current_user: User = D
         raise HTTPException(status_code=400, detail="Auction is not active")
     
     # Validate bid amount
-    min_bid = auction.get('current_highest_bid', auction['starting_price'])
+    min_bid = auction.get('current_highest_bid')
+    if not isinstance(min_bid, (int, float)):
+        min_bid = auction.get('starting_price', 0)
+    
     if bid_data.bid_amount <= min_bid:
         raise HTTPException(
             status_code=400, 
